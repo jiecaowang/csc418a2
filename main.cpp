@@ -332,7 +332,20 @@ void updateRenderStyle(){
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			break;
 		case OUTLINED:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			glPushMatrix();
+			    glEnable(GL_POLYGON_OFFSET_FILL);
+			    glPolygonOffset(1, 1);
+			    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			    drawCube();
+			    glDisable(GL_POLYGON_OFFSET_FILL);
+
+		    glPopMatrix();
+
+		    glPushMatrix();
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPopMatrix();
+	    
+		    
 			break;
 		default:
 			return;
@@ -805,6 +818,9 @@ void display(void)
 {
     // Clear the screen with the background colour
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+
+	// We only want what is in front to be rasterized.
+	glEnable(GL_DEPTH_TEST);
 
     // Setup the model-view transformation matrix
     glMatrixMode(GL_MODELVIEW);
