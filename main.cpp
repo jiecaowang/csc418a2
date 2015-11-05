@@ -200,6 +200,9 @@ void drawCube();
 // Image functions
 void writeFrame(char* filename, bool pgm, bool frontBuffer);
 
+// Control functions
+void updateRenderStyle();
+
 
 // ******************** FUNCTIONS ************************
 
@@ -318,6 +321,22 @@ void updateKeyframeButton(int)
 	// Let the user know the values have been updated
 	sprintf(msg, "Status: Keyframe %d updated successfully", keyframeID);
 	status->set_text(msg);
+}
+
+void updateRenderStyle(){
+	switch(renderStyle){
+		case WIREFRAME:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			break;
+		case SOLID:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			break;
+		case OUTLINED:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+			break;
+		default:
+			return;
+	}
 }
 
 // Load Keyframes From File button handler. Called when the "load keyframes from file" button is pressed
@@ -851,7 +870,7 @@ void display(void)
 		glRotatef(30.0, 1.0, 0.0, 0.0);
 
 		// determine render style and set glPolygonMode appropriately
-
+		updateRenderStyle();
 		// draw body part
 		glColor3f(1.0, 1.0, 1.0);
 		drawCube();
