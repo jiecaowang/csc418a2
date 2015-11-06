@@ -195,6 +195,9 @@ void motion(int x, int y);
 // Functions to help draw the object
 Vector getInterpolatedJointDOFS(float time);
 void drawCube();
+void drawPenguin();
+void drawCube(float width, float height, float thickness);
+void drawSquareFrustum(float width, float height, float thickness, float neck_butt_ratio);
 
 
 // Image functions
@@ -218,9 +221,9 @@ int main(int argc, char** argv)
     // Process program arguments
     if(argc != 3) {
         printf("Usage: demo [width] [height]\n");
-        printf("Using 640x480 window by default...\n");
-        Win[0] = 640;
-        Win[1] = 480;
+        printf("Using 1280x960 window by default...\n");
+        Win[0] = 1280;
+        Win[1] = 960;
     } else {
         Win[0] = atoi(argv[1]);
         Win[1] = atoi(argv[2]);
@@ -338,14 +341,14 @@ void updateRenderStyle(){
 				glEnable(GL_DEPTH_TEST);
 			    glPolygonOffset(1, 1);
 			    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			    glColor3f(0.5, 0.5, 0.5);
-			    drawCube();
+			    	// glColor3f(0.5, 0.0, 0.0);//default torso color
+				    drawPenguin();
 			    glDisable(GL_POLYGON_OFFSET_FILL);
-		    glPopMatrix();
-		    glPushMatrix();
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glPopMatrix();
-	    
+		    glPopMatrix();    
+	    	glColor3f(1.0, 1.0, 0.0);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glColor3f(1.0, 1.0, 1.0);
+	    	
 		    
 			break;
 		default:
@@ -886,8 +889,7 @@ void display(void)
 		// determine render style and set glPolygonMode appropriately
 		updateRenderStyle();
 		// draw body part
-		glColor3f(1.0, 1.0, 1.0);
-		drawCube();
+		drawPenguin();
 
 	glPopMatrix();
 	//
@@ -1103,7 +1105,7 @@ void writeFrame(char* filename, bool pgm, bool frontBuffer)
 
 	glReadBuffer(frontBuffer ? GL_FRONT : GL_BACK);
 
-	if( pgm )
+	if(pgm)
 	{
 		glReadPixels(0, 0, Win[0], Win[1],
 					 GL_LUMINANCE, GL_UNSIGNED_BYTE, frameData);
@@ -1115,4 +1117,152 @@ void writeFrame(char* filename, bool pgm, bool frontBuffer)
 					 GL_RGBA, GL_UNSIGNED_BYTE, frameData);
 		writePPM(filename, frameData, Win[0], Win[1]);
 	}
+}
+
+void drawPenguin()
+{
+	//this scales everything!
+    const float GENERAL_SCALAR = 0.2f;
+    
+    // TORSO
+    const float TORSO_WIDTH = 7.0f;
+    const float TORSO_HEIGHT = 12.0f;
+    const float TORSO_THICKNESS = 6.0f;
+    const float TORSO_NECK_BUTT_RATIO = 0.7f;
+    // ARM
+    // const float ARM_POSITION_X = TORSO_WIDTH/6;
+    // const float ARM_POSITION_Y = TORSO_HEIGHT/6;
+    // const float ARM_LENGTH = 13.0f;
+    // const float ARM_WIDTH = 5.0f;
+    // const float ARM_ROTARY_Y = ARM_LENGTH*4/10;
+    // // THIGH
+    // const float THIGH_LENGTH = 8.0f;
+    // const float THIGH_WIDTH = 2.0f;
+    // const float THIGH_ROTARY_Y = THIGH_LENGTH*4/10;
+    //     // FRONT THIGH
+    //     const float FRONT_THIGH_POSITION_X = -TORSO_WIDTH/5;
+    //     const float FRONT_THIGH_POSITION_Y = -TORSO_HEIGHT/2 + THIGH_LENGTH/2;
+    //     // BACK THIGH
+    //     const float BACK_THIGH_POSITION_X = TORSO_WIDTH/5;
+    //     const float BACK_THIGH_POSITION_Y = -TORSO_HEIGHT/2 + THIGH_LENGTH/2;
+
+    //     // CALVE
+    //     const float CALVE_LENGTH = 8.0f;
+    //     const float CALVE_WIDTH = 1.5f;
+    //     const float CALVE_X_POSITION = 0.0f;
+    //     const float CALVE_Y_POSITION = -THIGH_LENGTH + CALVE_WIDTH;
+    //     const float CALVE_ROTATORY_Y_POSITION = CALVE_LENGTH/2 - THIGH_WIDTH/2;
+        
+    // HEAD
+    const float HEAD_WIDTH = TORSO_WIDTH*TORSO_NECK_BUTT_RATIO;
+    const float HEAD_HEIGHT = 5.0f;
+    const float HEAD_THICKNESS = TORSO_THICKNESS*TORSO_NECK_BUTT_RATIO;
+    const float HEAD_POSITION_Y = TORSO_HEIGHT*9/20;
+
+    //     // EYE
+    //     const float EYE_SIZE = 0.8f;
+    //     // BEAK
+    //     const float BEAK_WIDTH = 8.0f;
+    //     const float UPPER_BEAK_HEIGHT = 1.7f;
+    //     const float LOWER_BEAK_HEIGHT = 1.0f;
+    //     const float BEAK_POSITION_X = -HEAD_SIZE*0.8;
+    //     const float BEAK_POSITION_Y = -HEAD_SIZE*0.1;
+
+    // // ROTARY
+    // const float ROTARY_SIZE = 0.3f;
+
+
+	// glPushMatrix();
+		glScalef(GENERAL_SCALAR, GENERAL_SCALAR, GENERAL_SCALAR);
+		
+		//Torso
+		glColor3f(0.0, 1.0, 1.0);
+		glColor3f(0.4, 1.0, 0.0);
+		drawSquareFrustum(TORSO_WIDTH, TORSO_HEIGHT, TORSO_THICKNESS, TORSO_NECK_BUTT_RATIO);
+		glPushMatrix();
+			//Head
+		glPopMatrix();
+	// glPopMatrix();
+}
+
+void drawCube(float width, float height, float thickness)
+{
+	glBegin(GL_QUADS);
+		// draw front face
+		glVertex3f(-width/2, -height/2,  thickness/2);
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f( width/2,  height/2,  thickness/2);
+		glVertex3f(-width/2,  height/2,  thickness/2);
+
+		// draw back face
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width/2,  height/2, -thickness/2);
+		glVertex3f(-width/2,  height/2, -thickness/2);
+
+		// draw left face
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f(-width/2, -height/2,  thickness/2);
+		glVertex3f(-width/2,  height/2,  thickness/2);
+		glVertex3f(-width/2,  height/2, -thickness/2);
+
+		// draw right face
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width/2,  height/2, -thickness/2);
+		glVertex3f( width/2,  height/2,  thickness/2);
+
+		// draw top
+		glVertex3f(-width/2,  height/2,  thickness/2);
+		glVertex3f( width/2,  height/2,  thickness/2);
+		glVertex3f( width/2,  height/2, -thickness/2);
+		glVertex3f(-width/2,  height/2, -thickness/2);
+
+		// draw bottom
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f(-width/2, -height/2,  thickness/2);
+	glEnd();
+}
+
+void drawSquareFrustum(float width, float height, float thickness, float neck_butt_ratio)
+{
+	glBegin(GL_QUADS);
+		// draw front face
+		glVertex3f(-width/2, -height/2,  thickness/2);
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+
+		// draw back face
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+
+		// draw left face
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f(-width/2, -height/2,  thickness/2);
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+
+		// draw right face
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+
+		// draw top
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2,  thickness*0.5*neck_butt_ratio);
+		glVertex3f( width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+		glVertex3f(-width*0.5*neck_butt_ratio,  height/2, -thickness*0.5*neck_butt_ratio);
+
+		// draw bottom
+		glVertex3f(-width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2, -thickness/2);
+		glVertex3f( width/2, -height/2,  thickness/2);
+		glVertex3f(-width/2, -height/2,  thickness/2);
+	glEnd();
 }
